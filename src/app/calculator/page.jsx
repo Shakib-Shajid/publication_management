@@ -47,7 +47,7 @@ const Page = () => {
                 </button>
                 {result !== null && (
                     <div className='mt-4 text-lg font-semibold'>
-                        Result: {result}
+                        Back: {result}
                     </div>
                 )}
             </div>

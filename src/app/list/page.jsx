@@ -7,15 +7,17 @@ const page = () => {
 
     return (
         <div>
-            <div className="overflow-x-auto">
-                <table className="table">
+            <div className="overflow-x-auto w-[80%] mx-auto">
+                <h3 className='text-3xl font-bold text-center my-10'>School & Library List</h3>
+                <table className="table text-sm">
                     {/* head */}
                     <thead>
-                        <tr>
-                            <th></th>
+                        <tr className='text-sm'>
+                            <th>Serial</th>
                             <th>Name</th>
                             <th>Job</th>
-                            <th>Favorite Color</th>
+                            <th>Delete</th>
+                            <th>Update</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -26,6 +28,8 @@ const page = () => {
                                     <td>{school.id}</td>
                                     <td>{school.name}</td>
                                     <td>{school.price}</td>
+                                    <td>Delete</td>
+                                    <td>Update</td>
                                 </tr>
                             ))
                         ) : (

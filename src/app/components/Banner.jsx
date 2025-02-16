@@ -28,7 +28,7 @@ const Banner = () => {
                     </Link>
                 </div>
                 <div>
-                    <Link href="">
+                    <Link href="/list">
                         <div className="card border-2 border-black shadow-2xl w-60 lg:w-80 mx-auto my-5">
                             <div className="card-body text-center">
                                 <h2 className="gap-2 text-xl font-semibold leading-7">School List</h2>
@@ -37,7 +37,7 @@ const Banner = () => {
                     </Link>
                 </div>
                 <div>
-                    <Link href="">
+                    <Link href="https://progressiveprokashony.com/order">
                         <div className="card border-2 border-black shadow-2xl w-60 lg:w-80 mx-auto my-5">
                             <div className="card-body text-center">
                                 <h2 className="gap-2 text-xl font-semibold leading-7">Our Books</h2>
