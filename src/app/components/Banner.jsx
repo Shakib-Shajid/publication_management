@@ -46,7 +46,7 @@ const Banner = () => {
                     </Link>
                 </div>
                 <div>
-                    <Link href="">
+                    <Link href="/order">
                         <div className="card border-2 border-black shadow-2xl w-60 lg:w-80 mx-auto my-5">
                             <div className="card-body text-center">
                                 <h2 className="gap-2 text-xl font-semibold leading-7">Order List</h2>
