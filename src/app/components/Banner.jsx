@@ -10,7 +10,7 @@ const Banner = () => {
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-5 border-2 border-blue-600 my-10 rounded-2xl py-10 w-[90%] md:w-full mx-auto'>
                 <div>
-                    <Link href="">
+                    <Link href="/memo">
                         <div className="card border-2 border-black shadow-2xl w-60 lg:w-80 mx-auto my-5">
                             <div className="card-body text-center">
                                 <h2 className="gap-2 text-xl font-semibold leading-7">Create Memo</h2>
@@ -19,7 +19,7 @@ const Banner = () => {
                     </Link>
                 </div>
                 <div>
-                    <Link href="">
+                    <Link href="/pending">
                         <div className="card border-2 border-black shadow-2xl w-60 lg:w-80 mx-auto my-5">
                             <div className="card-body text-center">
                                 <h2 className="gap-2 text-xl font-semibold leading-7">Pending Amount</h2>
