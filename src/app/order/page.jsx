@@ -60,6 +60,17 @@ const OrderPage = () => {
         }
     };
 
+    // Cancel edit mode
+    const handleCancelEdit = () => {
+        setEditId(null);
+        setBookName("");
+        setAmount("");
+        setReceiveAmount("");
+        setStatus("pending");
+        setOrderDate("");
+        setReceiveDate("");
+    };
+
     // Update an existing order
     const handleUpdateOrder = async (id) => {
         const response = await fetch("/order/api", {
@@ -204,6 +215,9 @@ const OrderPage = () => {
                                 />
                                 <button onClick={() => handleUpdateOrder(order._id)} className="bg-blue-500 text-white px-3 py-1 ml-2">
                                     Save
+                                </button>
+                                <button onClick={handleCancelEdit} className="bg-gray-500 text-white px-3 py-1 ml-2">
+                                    Cancel
                                 </button>
                             </div>
                         ) : (

@@ -1,19 +1,35 @@
 import { NextResponse } from "next/server";
+import { MongoClient } from "mongodb";
 
-// Temporary in-memory storage (Replace this with a database in real-world scenarios)
-let pendingItems = [];
+// MongoDB connection URI
+const uri = "mongodb+srv://managePro:O7zHoTQdHPE7O0Ff@cluster0.pvn5rcy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const client = new MongoClient(uri);
+
+// Define the database and collection
+const databaseName = "schoolDB"; // Your database name
+const collectionName = "pendingItems"; // Collection name for pending items
 
 // GET: Fetch all pending items (search by name if query is provided)
 export async function GET(req) {
   try {
     const { search } = req.nextUrl.searchParams;
-    const filteredItems = search
-      ? pendingItems.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
-      : pendingItems;
 
-    return NextResponse.json(filteredItems);
+    // Connect to MongoDB
+    await client.connect();
+    const database = client.db(databaseName);
+    const collection = database.collection(collectionName);
+
+    // Query the database
+    const filter = search
+      ? { name: { $regex: search, $options: "i" } } // Case-insensitive search
+      : {};
+
+    const pendingItems = await collection.find(filter).toArray();
+    return NextResponse.json(pendingItems);
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  } finally {
+    await client.close();
   }
 }
 
@@ -21,22 +37,31 @@ export async function GET(req) {
 export async function POST(req) {
   try {
     const { name, amount } = await req.json();
-    
+
     if (!name || !amount) {
       return NextResponse.json({ error: "Name and amount are required" }, { status: 400 });
     }
 
+    // Connect to MongoDB
+    await client.connect();
+    const database = client.db(databaseName);
+    const collection = database.collection(collectionName);
+
+    // Create a new pending item
     const newItem = {
-      _id: String(pendingItems.length + 1), // Generate a unique ID
       name,
       amount,
-      date: new Date().toISOString(), // Automatically add the current date
+      date: new Date().toISOString(), // Store the creation date
     };
 
-    pendingItems.push(newItem); // Store the new item
-    return NextResponse.json(newItem);
+    // Insert the new item into MongoDB
+    const result = await collection.insertOne(newItem);
+
+    return NextResponse.json({ _id: result.insertedId, ...newItem });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  } finally {
+    await client.close();
   }
 }
 
@@ -49,26 +74,33 @@ export async function PUT(req) {
       return NextResponse.json({ error: "All fields (ID, name, amount) are required" }, { status: 400 });
     }
 
-    // Find the item to update
-    const itemIndex = pendingItems.findIndex(item => item._id === id);
+    // Connect to MongoDB
+    await client.connect();
+    const database = client.db(databaseName);
+    const collection = database.collection(collectionName);
 
-    if (itemIndex === -1) {
+    // Find the item to update
+    const result = await collection.findOneAndUpdate(
+      { _id: new MongoClient.ObjectId(id) }, // Match the item by its _id
+      {
+        $set: {
+          name,
+          amount,
+          updatedAt: new Date().toISOString(), // Store the updated timestamp
+        },
+      },
+      { returnDocument: "after" } // Return the updated item
+    );
+
+    if (!result.value) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
 
-    // Keep the previous date, but add an updated timestamp (updatedAt)
-    const updatedItem = {
-      ...pendingItems[itemIndex],
-      name,
-      amount,
-      updatedAt: new Date().toISOString(), // Store the updated time
-    };
-
-    pendingItems[itemIndex] = updatedItem; // Update the item in the list
-
-    return NextResponse.json({ message: "Item updated successfully", updatedItem });
+    return NextResponse.json({ message: "Item updated successfully", updatedItem: result.value });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  } finally {
+    await client.close();
   }
 }
 
@@ -81,16 +113,22 @@ export async function DELETE(req) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
-    const itemIndex = pendingItems.findIndex(item => item._id === id);
+    // Connect to MongoDB
+    await client.connect();
+    const database = client.db(databaseName);
+    const collection = database.collection(collectionName);
 
-    if (itemIndex === -1) {
+    // Delete the pending item
+    const result = await collection.deleteOne({ _id: new MongoClient.ObjectId(id) });
+
+    if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
-
-    pendingItems.splice(itemIndex, 1); // Delete the item from the array
 
     return NextResponse.json({ message: "Item deleted successfully" });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  } finally {
+    await client.close();
   }
 }

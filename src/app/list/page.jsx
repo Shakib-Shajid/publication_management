@@ -69,6 +69,13 @@ const Page = () => {
         setNewSchool({ ...newSchool, name });
     };
 
+    // Cancel edit mode
+    const handleCancelEdit = () => {
+        setEditId(null);
+        setNewPrice("");
+        setNewSchool({ name: "", price: "" });
+    };
+
     // Update price and/or name
     const handleUpdate = async (id) => {
         const response = await fetch("/list/api", {
@@ -165,7 +172,7 @@ const Page = () => {
                                         />
                                     ) : (
                                         school.price
-                                    )}
+                                    )} %
                                 </td>
                                 <td>
                                     <button onClick={() => handleDelete(school._id)} className="bg-red-500 text-white px-3 py-1 rounded">
@@ -174,9 +181,14 @@ const Page = () => {
                                 </td>
                                 <td>
                                     {editId === school._id ? (
-                                        <button onClick={() => handleUpdate(school._id)} className="bg-green-500 text-white px-3 py-1 rounded">
-                                            Save
-                                        </button>
+                                        <div>
+                                            <button onClick={() => handleUpdate(school._id)} className="bg-green-500 text-white px-3 py-1 rounded">
+                                                Save
+                                            </button>
+                                            <button onClick={handleCancelEdit} className="bg-gray-500 text-white px-3 py-1 rounded ml-2">
+                                                Cancel
+                                            </button>
+                                        </div>
                                     ) : (
                                         <button onClick={() => handleEdit(school._id, school.price, school.name)} className="bg-blue-500 text-white px-3 py-1 rounded">
                                             Edit

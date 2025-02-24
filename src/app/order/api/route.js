@@ -1,14 +1,29 @@
 import { NextResponse } from "next/server";
+import { MongoClient } from "mongodb";
 
-// Temporary in-memory storage (replace this with a database in production)
-let orders = [];
+// MongoDB connection URI
+const uri = "mongodb+srv://managePro:O7zHoTQdHPE7O0Ff@cluster0.pvn5rcy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const client = new MongoClient(uri);
+
+// Define the database and collection
+const databaseName = "schoolDB"; // Your database name
+const collectionName = "orders"; // Collection name for orders
 
 // GET: Fetch all orders
 export async function GET() {
     try {
+        // Connect to MongoDB
+        await client.connect();
+        const database = client.db(databaseName);
+        const collection = database.collection(collectionName);
+
+        // Fetch all orders from the database
+        const orders = await collection.find().toArray();
         return NextResponse.json(orders);
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
+    } finally {
+        await client.close();
     }
 }
 
@@ -21,21 +36,30 @@ export async function POST(req) {
             return NextResponse.json({ error: "Book name, amount, and order date are required" }, { status: 400 });
         }
 
+        // Connect to MongoDB
+        await client.connect();
+        const database = client.db(databaseName);
+        const collection = database.collection(collectionName);
+
+        // Create a new order object
         const newOrder = {
-            _id: (orders.length + 1).toString(),
             bookName,
             amount,
             receiveAmount,
             status,
             orderDate,
-            receiveDate
+            receiveDate,
+            dateCreated: new Date().toISOString() // Add creation date
         };
 
-        orders.push(newOrder);
+        // Insert the new order into the MongoDB collection
+        const result = await collection.insertOne(newOrder);
 
-        return NextResponse.json(newOrder);
+        return NextResponse.json({ _id: result.insertedId, ...newOrder });
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
+    } finally {
+        await client.close();
     }
 }
 
@@ -48,18 +72,37 @@ export async function PUT(req) {
             return NextResponse.json({ error: "ID, book name, amount, and order date are required" }, { status: 400 });
         }
 
-        const orderIndex = orders.findIndex(order => order._id === id);
+        // Connect to MongoDB
+        await client.connect();
+        const database = client.db(databaseName);
+        const collection = database.collection(collectionName);
 
-        if (orderIndex === -1) {
+        // Find the order by ID and update it
+        const result = await collection.findOneAndUpdate(
+            { _id: new MongoClient.ObjectId(id) }, // Match the order by its _id
+            {
+                $set: {
+                    bookName,
+                    amount,
+                    receiveAmount,
+                    status,
+                    orderDate,
+                    receiveDate,
+                    updatedAt: new Date().toISOString(), // Store the updated timestamp
+                },
+            },
+            { returnDocument: "after" } // Return the updated document
+        );
+
+        if (!result.value) {
             return NextResponse.json({ error: "Order not found" }, { status: 404 });
         }
 
-        const updatedOrder = { _id: id, bookName, amount, receiveAmount, status, orderDate, receiveDate };
-        orders[orderIndex] = updatedOrder;
-
-        return NextResponse.json(updatedOrder);
+        return NextResponse.json({ message: "Order updated successfully", updatedOrder: result.value });
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
+    } finally {
+        await client.close();
     }
 }
 
@@ -72,16 +115,22 @@ export async function DELETE(req) {
             return NextResponse.json({ error: "ID is required" }, { status: 400 });
         }
 
-        const orderIndex = orders.findIndex(order => order._id === id);
+        // Connect to MongoDB
+        await client.connect();
+        const database = client.db(databaseName);
+        const collection = database.collection(collectionName);
 
-        if (orderIndex === -1) {
+        // Delete the order by ID
+        const result = await collection.deleteOne({ _id: new MongoClient.ObjectId(id) });
+
+        if (result.deletedCount === 0) {
             return NextResponse.json({ error: "Order not found" }, { status: 404 });
         }
-
-        orders.splice(orderIndex, 1); // Delete the order from the array
 
         return NextResponse.json({ message: "Order deleted successfully" });
     } catch (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
+    } finally {
+        await client.close();
     }
 }
