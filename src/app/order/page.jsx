@@ -169,71 +169,132 @@ const OrderPage = () => {
             </form>
 
             {/* Display Order List */}
-            <ul>
-                {orderList.map((order) => (
-                    <li key={order._id}>
+            <table className="table text-sm w-full">
+    <thead>
+        <tr className="text-sm">
+            <th>Serial</th>
+            <th>Book Name</th>
+            <th>Amount</th>
+            <th>Received Amount</th>
+            <th>Status</th>
+            <th>Order Date</th>
+            <th>Receive Date</th>
+            <th>Delete</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+    <tbody>
+        {orderList.length > 0 ? (
+            orderList.map((order, index) => (
+                <tr key={order._id}>
+                    <td>{index + 1}</td>
+                    <td>
+                        {editId === order._id ? (
+                            <input
+                                type="text"
+                                value={bookName}
+                                onChange={handleBookNameChange}
+                                className="border px-2 py-1 w-20"
+                            />
+                        ) : (
+                            order.bookName
+                        )}
+                    </td>
+                    <td>
+                        {editId === order._id ? (
+                            <input
+                                type="text"
+                                value={amount}
+                                onChange={handleAmountChange}
+                                className="border px-2 py-1 w-20"
+                            />
+                        ) : (
+                            order.amount
+                        )}
+                    </td>
+                    <td>
+                        {editId === order._id ? (
+                            <input
+                                type="text"
+                                value={receiveAmount}
+                                onChange={handleReceiveAmountChange}
+                                className="border px-2 py-1 w-20"
+                            />
+                        ) : (
+                            order.receiveAmount ? order.receiveAmount : "Not received"
+                        )}
+                    </td>
+                    <td>
+                        {editId === order._id ? (
+                            <select
+                                value={status}
+                                onChange={handleStatusChange}
+                                className="border px-2 py-1 w-20"
+                            >
+                                <option value="pending">Pending</option>
+                                <option value="received">Received</option>
+                            </select>
+                        ) : (
+                            order.status
+                        )}
+                    </td>
+                    <td>
+                        {editId === order._id ? (
+                            <input
+                                type="date"
+                                value={orderDate}
+                                onChange={handleOrderDateChange}
+                                className="border px-2 py-1 w-20"
+                            />
+                        ) : (
+                            order.orderDate
+                        )}
+                    </td>
+                    <td>
+                        {editId === order._id ? (
+                            <input
+                                type="date"
+                                value={receiveDate}
+                                onChange={handleReceiveDateChange}
+                                className="border px-2 py-1 w-20"
+                            />
+                        ) : (
+                            order.receiveDate || "Not received yet"
+                        )}
+                    </td>
+                    <td>
+                        <button onClick={() => handleDelete(order._id)} className="bg-red-500 text-white px-3 py-1 rounded">
+                            Delete
+                        </button>
+                    </td>
+                    <td>
                         {editId === order._id ? (
                             <div>
-                                {/* Edit form for selected order */}
-                                <input
-                                    type="text"
-                                    value={bookName}
-                                    onChange={handleBookNameChange}
-                                    className="border px-2 py-1"
-                                />
-                                <input
-                                    type="text"
-                                    value={amount}
-                                    onChange={handleAmountChange}
-                                    className="border px-2 py-1 ml-2"
-                                />
-                                <input
-                                    type="text"
-                                    value={receiveAmount}
-                                    onChange={handleReceiveAmountChange}
-                                    className="border px-2 py-1 ml-2"
-                                />
-                                <select
-                                    value={status}
-                                    onChange={handleStatusChange}
-                                    className="border px-2 py-1 ml-2"
-                                >
-                                    <option value="pending">Pending</option>
-                                    <option value="received">Received</option>
-                                </select>
-                                <input
-                                    type="date"
-                                    value={orderDate}
-                                    onChange={handleOrderDateChange}
-                                    className="border px-2 py-1 ml-2"
-                                />
-                                <input
-                                    type="date"
-                                    value={receiveDate}
-                                    onChange={handleReceiveDateChange}
-                                    className="border px-2 py-1 ml-2"
-                                />
-                                <button onClick={() => handleUpdateOrder(order._id)} className="bg-blue-500 text-white px-3 py-1 ml-2">
+                                <button onClick={() => handleUpdateOrder(order._id)} className="bg-green-500 text-white px-3 py-1 rounded">
                                     Save
                                 </button>
-                                <button onClick={handleCancelEdit} className="bg-gray-500 text-white px-3 py-1 ml-2">
+                                <button onClick={handleCancelEdit} className="bg-gray-500 text-white px-3 py-1 rounded ml-2">
                                     Cancel
                                 </button>
                             </div>
                         ) : (
-                            <div>
-                                {order.bookName} - {order.amount} - {order.receiveAmount ? order.receiveAmount : "Not received"} - {order.status} - {order.orderDate} - {order.receiveDate || "Not received yet"}
-                                <button onClick={() => handleDelete(order._id)} className="bg-red-500 text-white px-3 py-1 ml-2">
-                                    Delete
-                                </button>
-                                <button onClick={() => { setEditId(order._id); setBookName(order.bookName); setAmount(order.amount); setReceiveAmount(order.receiveAmount); setStatus(order.status); setOrderDate(order.orderDate); setReceiveDate(order.receiveDate); }} className="bg-yellow-500 text-white px-3 py-1 ml-2">
-                                    Edit
-                                </button>
-                            </div>
+                            <button onClick={() => { setEditId(order._id); setBookName(order.bookName); setAmount(order.amount); setReceiveAmount(order.receiveAmount); setStatus(order.status); setOrderDate(order.orderDate); setReceiveDate(order.receiveDate); }} className="bg-blue-500 text-white px-3 py-1 rounded">
+                                Edit
+                            </button>
                         )}
-                    </li>
-                ))}
-            </ul>
+                    </td>
+                </tr>
+            ))
+        ) : (
+            <tr>
+                <td colSpan="9" className="text-center">
+                    No orders found
+                </td>
+            </tr>
+        )}
+    </tbody>
+</table>
+
         </div>
     );
 };

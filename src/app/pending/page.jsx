@@ -123,45 +123,80 @@ const PendingPage = () => {
             </form>
 
             {/* Display Pending List or No Pending Found */}
-            {filteredList.length === 0 ? (
-                <p className="text-center text-gray-500">No pending found</p>
-            ) : (
-                <ul>
-                    {filteredList.map((pending) => (
-                        <li key={pending._id}>
-                            {editId === pending._id ? (
-                                <div>
-                                    <input
-                                        type="text"
-                                        value={newName}
-                                        onChange={(e) => setNewName(e.target.value)}
-                                        className="border px-2 py-1"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={newAmount}
-                                        onChange={(e) => setNewAmount(e.target.value)}
-                                        className="border px-2 py-1 ml-2"
-                                    />
-                                    <button onClick={() => handleUpdatePending(pending._id)} className="bg-blue-500 text-white px-3 py-1 ml-2">
-                                        Save
-                                    </button>
-                                </div>
-                            ) : (
-                                <div>
-                                    {pending.name} - {pending.amount} - {pending.date}
-                                    <button onClick={() => handleDelete(pending._id)} className="bg-red-500 text-white px-3 py-1 ml-2">
-                                        Delete
-                                    </button>
-                                    <button onClick={() => { setEditId(pending._id); setNewName(pending.name); setNewAmount(pending.amount); }} className="bg-yellow-500 text-white px-3 py-1 ml-2">
-                                        Edit
-                                    </button>
-                                </div>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            )}
+            <table className="table text-sm w-full">
+    <thead>
+        <tr className="text-sm">
+            <th>Serial</th>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Delete</th>
+            <th>Update</th>
+        </tr>
+    </thead>
+    <tbody>
+        {filteredList.length > 0 ? (
+            filteredList.map((pending, index) => (
+                <tr key={pending._id}>
+                    <td>{index + 1}</td>
+                    <td>
+                        {editId === pending._id ? (
+                            <input
+                                type="text"
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                className="border px-2 py-1 w-20"
+                            />
+                        ) : (
+                            pending.name
+                        )}
+                    </td>
+                    <td>
+                        {editId === pending._id ? (
+                            <input
+                                type="text"
+                                value={newAmount}
+                                onChange={(e) => setNewAmount(e.target.value)}
+                                className="border px-2 py-1 w-20"
+                            />
+                        ) : (
+                            pending.amount
+                        )}
+                    </td>
+                    <td>{pending.date}</td>
+                    <td>
+                        <button onClick={() => handleDelete(pending._id)} className="bg-red-500 text-white px-3 py-1 rounded">
+                            Delete
+                        </button>
+                    </td>
+                    <td>
+                        {editId === pending._id ? (
+                            <div>
+                                <button onClick={() => handleUpdatePending(pending._id)} className="bg-green-500 text-white px-3 py-1 rounded">
+                                    Save
+                                </button>
+                                <button onClick={() => setEditId(null)} className="bg-gray-500 text-white px-3 py-1 rounded ml-2">
+                                    Cancel
+                                </button>
+                            </div>
+                        ) : (
+                            <button onClick={() => { setEditId(pending._id); setNewName(pending.name); setNewAmount(pending.amount); }} className="bg-blue-500 text-white px-3 py-1 rounded">
+                                Edit
+                            </button>
+                        )}
+                    </td>
+                </tr>
+            ))
+        ) : (
+            <tr>
+                <td colSpan="6" className="text-center">
+                    No pending found
+                </td>
+            </tr>
+        )}
+    </tbody>
+</table>
+
         </div>
     );
 };
